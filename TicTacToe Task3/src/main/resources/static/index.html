@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tic - Tac - Toe</title>
+    <style>
+        .board { display: grid; grid-template-columns: repeat(3, 100px); gap: 5px; }
+        .cell { width: 100px; height: 100px; font-size: 24px; }
+        .status { margin: 20px 0; }
+        .auth-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .auth-input { margin: 5px; padding: 5px; }
+    </style>
+</head>
+<body>
+<h1>Tic - Tac - Toe</h1>
+<div class="auth-section">
+    <h3>Authorization</h3>
+    <div>
+        <input class="auth-input" type="text" id="login" placeholder="Login">
+        <input class="auth-input" type="password" id="password" placeholder="Password">
+        <button onclick="register()">Sign up</button>
+        <button onclick="login()">Log in</button>
+    </div>
+    <div id="authStatus" style="margin-top: 10px; color: green;"></div>
+</div>
+
+<button onclick="createGame()">New game</button>
+<div class="status" id="status"></div>
+<div class="board" id="board"></div>
+
+<script>
+    let currentGameId = null;
+    let authToken = null;
+
+    async function register() {
+        const login = document.getElementById('login').value;
+        const password = document.getElementById('password').value;
+
+        const response = await fetch('/auth/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ login, password })
+        });
+
+        const message = await response.text();
+        document.getElementById('authStatus').textContent = message;
+    }
+
+    async function login() {
+        const login = document.getElementById('login').value;
+        const password = document.getElementById('password').value;
+
+        const credentials = btoa(login + ':' + password);
+
+        const response = await fetch('/auth/login', {
+            method: 'POST',
+            headers: { 'Authorization': 'Basic ' + credentials }
+        });
+
+        if (response.ok) {
+            const userId = await response.text();
+            authToken = credentials;
+            document.getElementById('authStatus').textContent = 'Successful login User ID: ' + userId;
+        } else {
+            document.getElementById('authStatus').textContent = 'Authorization error';
+        }
+    }
+    async function createGame() {
+        if (!authToken) {
+            alert('Log in');
+            return;
+        }
+
+        const response = await fetch('/game', {
+            method: 'POST',
+            headers: { 'Authorization': 'Basic ' + authToken }
+        });
+        const game = await response.json();
+        currentGameId = game.id;
+        updateBoard(game);
+    }
+
+    async function makeMove(row, col) {
+        if (!authToken) {
+            alert('Log in');
+            return;
+        }
+
+        const response = await fetch(`/game/${currentGameId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Basic ' + authToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ row, col })
+        });
+        const game = await response.json();
+        updateBoard(game);
+    }
+
+    function updateBoard(game) {
+        const board = document.getElementById('board');
+        board.innerHTML = '';
+
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                const cell = document.createElement('button');
+                cell.className = 'cell';
+                cell.textContent = game.board[i][j] === 1 ? 'X' :
+                                 game.board[i][j] === 2 ? 'O' : '';
+                cell.onclick = () => makeMove(i, j);
+                board.appendChild(cell);
+            }
+        }
+
+        document.getElementById('status').textContent =
+            `Status: ${game.status} | Motion: ${game.currentPlayer}`;
+    }
+</script>
+</body>
+</html>
