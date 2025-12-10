@@ -16,7 +16,7 @@ public class UserService {
 
     public boolean registerUser(String login, String password) {
         if (userRepository.findByLogin(login).isPresent()) {
-            return false; // пользователь уже существует
+            return false;
         }
         User user = new User(login, password);
         userRepository.save(user);
