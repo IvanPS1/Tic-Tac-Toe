@@ -26,13 +26,11 @@ public class AuthFilter implements Filter {
 
         String path = httpRequest.getRequestURI();
 
-        // Пропускаем auth и главную страницу без проверки
         if (path.startsWith("/auth/") || path.equals("/")) {
             chain.doFilter(request, response);
             return;
         }
 
-        // Для игровых endpoints проверяем авторизацию
         String authHeader = httpRequest.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Basic ")) {
             httpResponse.setStatus(401);
@@ -52,7 +50,6 @@ public class AuthFilter implements Filter {
                 return;
             }
 
-            // Авторизация успешна - пропускаем запрос
             chain.doFilter(request, response);
 
         } catch (Exception e) {
