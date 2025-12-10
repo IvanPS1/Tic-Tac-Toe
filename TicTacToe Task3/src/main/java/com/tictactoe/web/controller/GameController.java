@@ -30,14 +30,12 @@ public class GameController {
         if (!"a game is underway".equals(game.status)) {
             throw new RuntimeException("Game finished");
         }
-
-        // ПОМЕНЯЙ ЭТИ СТРОКИ:
-        int[][] board = game.getBoard(); // получаем доску
+        int[][] board = game.getBoard();
         if (board[request.row][request.col] != 0) {
             throw new RuntimeException("Cell occupied");
         }
-        board[request.row][request.col] = 1; // X
-        game.setBoard(board); // сохраняем доску обратно
+        board[request.row][request.col] = 1;
+        game.setBoard(board); 
 
         gameService.checkWinner(game);
 
