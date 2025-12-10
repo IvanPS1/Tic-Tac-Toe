@@ -8,11 +8,11 @@ import java.util.UUID;
 public class GameService {
 
     public Game makeAIMove(Game game) {
-        int[][] board = game.getBoard(); // ВМЕСТО game.board
+        int[][] board = game.getBoard();
         Move bestMove = findBestMove(board);
         if (bestMove != null) {
-            board[bestMove.row][bestMove.col] = 2; // O
-            game.setBoard(board); // ВМЕСТО прямого присваивания
+            board[bestMove.row][bestMove.col] = 2;
+            game.setBoard(board);
             game.currentPlayer = "X";
             checkWinner(game);
         }
