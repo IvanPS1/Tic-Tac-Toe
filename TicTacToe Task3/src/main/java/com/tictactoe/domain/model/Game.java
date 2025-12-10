@@ -11,7 +11,7 @@ public class Game {
     public UUID id;
 
     @Column(name = "board_state", length = 9)
-    public String boardState = "000000000"; // 3x3 как строка
+    public String boardState = "000000000";
 
     public String status = "a game is underway";
     public String currentPlayer = "X";
@@ -19,8 +19,6 @@ public class Game {
     public Game() {
         this.id = UUID.randomUUID();
     }
-
-    // Методы для работы с доской
     public int[][] getBoard() {
         int[][] board = new int[3][3];
         for (int i = 0; i < 9; i++) {
